@@ -3181,3 +3181,65 @@ discount approvals; and hidden-fee detection would need new tables, not just a n
 tool.
 
 ---
+## Problem 11 — Publish to a public GitHub repository
+
+**User prompt:** Push the code to a public GitHub repository and record the URL in
+`output/github_url.txt`. Do not include the real `.env` with the API key — use
+`.env.example` — and do not leak anything confidential. Include **both** databases.
+
+**Published:** <https://github.com/naraniwidodo/campus-customs-multi-agent-ops>
+
+**Secret scanning before anything irreversible happened.** Publishing is outward
+facing and cannot be undone, so the tree was scanned *before* any repository
+existed:
+
+- The real credential values were loaded from the parent `.env` **without printing
+  them**, then searched for across every file that would be committed. The search
+  covered `PORTKEY_API_KEY`, `OUTLOOK_CLIENT_ID` and `OUTLOOK_TENANT_ID`.
+- Pattern scan for OpenAI-style keys, GitHub tokens, AWS keys, bearer tokens,
+  private key blocks and email addresses: **all none**.
+- Re-run against the *staged* tree immediately before committing: **clean**.
+
+**A false positive worth recording.** The first staged-tree scan reported four
+"leaks" — but the matched values were `https://api.portkey.ai/v1`, a public URL, and
+`gpt-5.6-luna`, a model name. The check had treated any value of twelve characters
+or more as a secret. Narrowed to credential-bearing keys only and re-run; the actual
+API key appeared nowhere. Recorded because a scan that cries wolf is worse than none
+— the next person reading these results needs to know which hits were real.
+
+**There is no local `.env` to leak.** The key is read from a `.env` one directory
+above the project, which is outside the repository entirely.
+
+**`.gitignore` rewritten** to exclude `.env`, `*.key`, `*.pem`, `token_cache.json`,
+`.venv/`, `node_modules/`, `frontend/dist/` and `__pycache__/` — and to **stop
+excluding the working-copy database**, since the user asked for both. The reason both
+are tracked is written into the file itself so it does not read as an oversight.
+
+**A root `README.md` was added** — the repository had none, only a Vite default and
+the MCP server's. It covers the structural agents-prepare/humans-execute separation,
+the five agents, the five safety rules, how to run it, why both databases are
+tracked, and the $112 scarcity finding.
+
+**Verified against GitHub after pushing, not merely asserted:**
+
+| Check | Result |
+|---|---|
+| visibility | **PUBLIC** |
+| `.env` | **NOT on GitHub** |
+| `.env.example` | present |
+| `campus_customs.db` (seed) | present |
+| `data/campus_customs_new.db` (working copy) | present |
+| files committed | 69, then 70 with the URL file |
+| working tree | clean |
+
+**Flagged to the user, not a credential:** the macOS username `nurazizahmaharani`
+appears in absolute paths inside `.mcp.json`, `output/audit_trail.json` and
+`mcp_server/README.md`, and is now publicly visible. Their GitHub account is a
+different name. Raised before publishing with an offer to genericize the paths
+afterwards; not changed unilaterally, since `.mcp.json`'s absolute paths are what
+make the local setup work.
+
+**`output/github_url.txt`** written with the repository URL, then committed and
+pushed in a second commit.
+
+---
