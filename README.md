@@ -44,33 +44,94 @@ Nothing is ever sent to a customer or vendor. Drafts stay on the board.
 
 ## Running it
 
+### 0 · Install
+
 ```bash
 python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
-cp .env.example .env          # add your own PORTKEY_API_KEY
+cp .env.example .env          # then add your own PORTKEY_API_KEY
 ```
 
-Backend — **plain HTTP, not HTTPS**:
+The real `.env` is never committed. The model is pinned to `gpt-6-luna`.
+
+### 1 · Copy the original database to the working copy
+
+Do this whenever you want a clean run. The seed is **read, never written** — the
+agents only ever touch the working copy.
+
+```bash
+cp data/campus_customs.db data/campus_customs_new.db
+```
+
+### 2 · Start the MCP server
+
+The agents' only access to the shop. It speaks stdio, which is how an MCP client
+launches it — the backend starts it automatically, so you normally do **not** need
+to run it by hand:
+
+```bash
+cd mcp_server && ../.venv/bin/python server.py
+```
+
+To inspect it directly over HTTP at `http://127.0.0.1:8003/mcp`:
+
+```bash
+cd mcp_server && ../.venv/bin/python server.py --http
+```
+
+### 3 · Start the FastAPI backend
+
+**Plain HTTP, not HTTPS** — there is no TLS listener, and `https://localhost:8000`
+fails with an error that reads like the backend is down.
 
 ```bash
 cd backend && ../.venv/bin/python -m uvicorn main:app --reload --port 8000
 ```
 
-Dashboard:
+`--reload` runs a supervisor *and* a worker, so stop the whole group:
+
+```bash
+pkill -f "uvicorn main:app"; sleep 2; pgrep -f "uvicorn main:app" || echo stopped
+```
+
+### 4 · Start the React board
 
 ```bash
 cd frontend && npm install && npm run dev     # http://localhost:5173
 ```
 
+The board calls `/api/*`, which Vite proxies to the backend, so the browser only
+ever talks to one origin.
+
+### 5 · Reset before a full three-ticket run
+
+Always reset first, so the run starts from the seeded scenario:
+
+```bash
+curl -X POST http://localhost:8000/api/reset
+```
+
+or press **Reset to original data** on the board, or copy the file as in step 1.
+
+**Verify a reset by row counts, not by hash** — the working copy carries an extra
+`proposals` table the seed lacks, so the two files will never hash alike:
+
+| Check | Expected |
+|---|---|
+| tickets | 101, 102, 103 all `open` |
+| `cash_accounts.checking` | $3,400.00 |
+| `payments` | empty |
+| `proposals` | empty |
+| `desk.date_today` | `2026-08-31` |
+
+Then pick a ticket on the board and press **Run the agent team**. Approving anything
+restarts the agents on that ticket automatically — you do not re-run by hand.
+
 ## The databases
 
 Both are tracked deliberately:
 
-- **`campus_customs.db`** — the pristine seed, never written to
+- **`data/campus_customs.db`** — the pristine seed, never written to
 - **`data/campus_customs_new.db`** — the working copy the agents read and write
-
-Reset with `POST /api/reset`, or `cp campus_customs.db data/campus_customs_new.db`.
-Verify a reset by **row counts**, not by hash: the working copy carries an extra
-`proposals` table the seed lacks.
 
 ## The scenario, and its sharpest finding
 

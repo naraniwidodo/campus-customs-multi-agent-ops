@@ -3,7 +3,7 @@
 Field notes on the Campus Customs database, written so the agent team can read
 the schema without guessing at what a column means.
 
-- **Seed (never written to):** `campus_customs.db`
+- **Seed (never written to):** `data/campus_customs.db`
 - **Working copy (agents read/write):** `data/campus_customs_new.db`
 - **Tables:** 9 seeded — `cash_accounts`, `desk`, `inventory`, `invoices`,
   `leases`, `payments`, `pricing`, `tickets`, `vendors` — plus **`proposals`**,

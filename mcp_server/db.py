@@ -3,7 +3,7 @@
 Every connection resolves through CAMPUS_DB_PATH so the pristine seed can never
 be opened by accident:
 
-    campus_customs.db          seed, never written to
+    data/campus_customs.db     seed, never written to
     data/campus_customs_new.db working copy, this is what we open
 
 The read tools open the file in SQLite read-only mode (``mode=ro``), so a write
@@ -36,7 +36,7 @@ def connect_ro() -> sqlite3.Connection:
     if not path.exists():
         raise FileNotFoundError(
             f"Campus Customs database not found at {path}. "
-            "Copy campus_customs.db to data/campus_customs_new.db, "
+            "Copy data/campus_customs.db to data/campus_customs_new.db, "
             "or set CAMPUS_DB_PATH."
         )
     conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
@@ -113,7 +113,7 @@ def connect_rw() -> sqlite3.Connection:
     if not path.exists():
         raise FileNotFoundError(
             f"Campus Customs database not found at {path}. "
-            "Copy campus_customs.db to data/campus_customs_new.db, "
+            "Copy data/campus_customs.db to data/campus_customs_new.db, "
             "or set CAMPUS_DB_PATH."
         )
     conn = sqlite3.connect(path)

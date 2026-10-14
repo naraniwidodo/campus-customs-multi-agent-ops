@@ -3,7 +3,7 @@
 **MCP server:** FastMCP
 
 **Database file it uses:** `data/campus_customs_new.db` — copied from the original
-`campus_customs.db` file, which we have decided not to change anything to, to keep
+`data/campus_customs.db` file, which we have decided not to change anything to, to keep
 it original for reset purposes.
 
 **Ten tools it has** — six read, four write:
@@ -136,7 +136,7 @@ Business rule 7 requires resetting before a full run. There is no reset tool, by
 design — it is an operator action:
 
 ```bash
-cd "/Users/nurazizahmaharani/Desktop/AI Foundations/Homework 5" && cp -p campus_customs.db data/campus_customs_new.db
+cd "/Users/nurazizahmaharani/Desktop/AI Foundations/Homework 5" && cp -p data/campus_customs.db data/campus_customs_new.db
 ```
 
 **Verify a reset by row counts, not by hash.** The working copy carries the

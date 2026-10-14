@@ -19,7 +19,7 @@ from typing import Any
 
 from config import DB_PATH, PROJECT_ROOT
 
-SEED_PATH = PROJECT_ROOT / "campus_customs.db"
+SEED_PATH = PROJECT_ROOT / "data" / "campus_customs.db"
 
 
 class ApprovalError(Exception):

@@ -3243,3 +3243,51 @@ make the local setup work.
 pushed in a second commit.
 
 ---
+**Follow-up 1 — check the file structure against the assignment layout.**
+
+*User prompt:* Shared the assignment's expected file layout and asked for the
+structure to be checked before submission.
+
+*Compared path by path. Two mismatches found:*
+
+| Expected | Where it actually was |
+|---|---|
+| `data/campus_customs.db` | at the project **root**, not in `data/` |
+| `output/mcp_smoke.json` | `mcp_tool_tests.json`, at the **root** |
+
+Everything else matched, including all five agent prompts and every `output/`
+deliverable.
+
+*Both moved with `git mv`* so history follows the files, then **every reference
+updated** — found by grep first rather than fixed reactively:
+
+- `backend/approvals.py` — `SEED_PATH`, the one place in code that resolves the
+  seed.
+- `mcp_server/db.py` — the module docstring and the not-found error message, which
+  tells the operator where to copy from.
+- `README.md`, `mcp_server/README.md`, `output/harness.md` — the seed path and the
+  `cp` reset commands.
+
+*Verified after moving, not assumed:* the backend and MCP modules still import,
+`SEED_PATH` resolves to the new location and exists, and **a real reset through
+`approvals.reset_database()` succeeded** — 3 open tickets, $3,400.00, 0 payments,
+0 proposals. The seed still hashes to `23686a90…f360a`, unchanged by the move.
+
+*The assignment also specifies what the README must explain*, and the existing one
+covered only part of it — **starting the MCP server was missing entirely**. The
+running section was rewritten as a numbered sequence covering all five required
+points:
+
+0. install
+1. **copy the original database to the working copy** for a clean run
+2. **start the MCP server** (stdio, with the note that the backend launches it
+   automatically, plus the HTTP option for inspection)
+3. **start the FastAPI backend** — with the plain-HTTP warning and the
+   kill-the-whole-group stop command, since `--reload` runs a supervisor and a worker
+4. **start the React board**
+5. **reset before a full three-ticket run**, with the expected row counts and the
+   reminder that a reset is verified by row counts rather than by hash
+
+*Final check:* **all 26 expected paths present**, nothing left at the old locations.
+
+---
