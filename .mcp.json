@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "yale-som-courses": {
+      "command": "/Users/nurazizahmaharani/Desktop/AI Foundations/Lecture 09/yale_som_courses_mcp/mcp/.venv/bin/python",
+      "args": [
+        "/Users/nurazizahmaharani/Desktop/AI Foundations/Lecture 09/yale_som_courses_mcp/mcp/mcp_server.py"
+      ]
+    },
+    "outlook-send": {
+      "command": "/Users/nurazizahmaharani/Desktop/AI Foundations/mcp_servers/.venv/bin/python",
+      "args": [
+        "/Users/nurazizahmaharani/Desktop/AI Foundations/mcp_servers/mcp_outlook_server.py"
+      ]
+    },
+    "campus-customs-ops": {
+      "command": "/Users/nurazizahmaharani/Desktop/AI Foundations/Homework 5/.venv/bin/python",
+      "args": [
+        "/Users/nurazizahmaharani/Desktop/AI Foundations/Homework 5/mcp_server/server.py"
+      ],
+      "env": {
+        "CAMPUS_DB_PATH": "/Users/nurazizahmaharani/Desktop/AI Foundations/Homework 5/data/campus_customs_new.db"
+      }
+    }
+  }
+}

@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Customs — Desk Tickets</title>
+<style>
+  :root {
+    --bg: #fbfbfa;
+    --surface: #ffffff;
+    --line: #e6e4e0;
+    --line-soft: #f0eeeb;
+    --ink: #1c1b19;
+    --ink-2: #55524d;
+    --ink-3: #86827b;
+    --accent: #1a4f8a;
+    --accent-soft: #eef3f9;
+    --warn: #8a5a1a;
+    --warn-soft: #fbf3e8;
+    --stop: #8a2c2c;
+    --stop-soft: #fbeeee;
+    --ok: #2c6b45;
+    --ok-soft: #eef6f1;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 48px 28px 96px; }
+
+  header { margin-bottom: 36px; }
+  h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 6px; }
+  .sub { color: var(--ink-3); font-size: 14px; margin: 0; }
+  .meta { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 18px;
+          padding: 14px 18px; background: var(--surface);
+          border: 1px solid var(--line); border-radius: var(--radius); }
+  .meta div { font-size: 13px; }
+  .meta dt { color: var(--ink-3); font-size: 11px; text-transform: uppercase;
+             letter-spacing: 0.06em; margin-bottom: 2px; }
+  .meta dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 500; }
+
+  nav { display: flex; gap: 2px; border-bottom: 1px solid var(--line);
+        margin-bottom: 32px; overflow-x: auto; }
+  nav button {
+    appearance: none; border: 0; background: none; cursor: pointer;
+    font: inherit; font-size: 14px; color: var(--ink-3);
+    padding: 11px 16px; border-bottom: 2px solid transparent;
+    margin-bottom: -1px; white-space: nowrap; transition: color .12s;
+  }
+  nav button:hover { color: var(--ink); }
+  nav button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 550; }
+  nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px 4px 0 0; }
+
+  .panel[hidden] { display: none; }
+
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em;
+       color: var(--ink-3); font-weight: 600; margin: 0 0 14px; }
+  section + section { margin-top: 40px; }
+
+  .card { background: var(--surface); border: 1px solid var(--line);
+          border-radius: var(--radius); padding: 22px 24px; }
+
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 18px 24px; }
+  .facts dt { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+              color: var(--ink-3); margin-bottom: 3px; }
+  .facts dd { margin: 0; font-size: 14px; font-variant-numeric: tabular-nums; }
+
+  .tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .03em;
+         padding: 2px 8px; border-radius: 20px; vertical-align: 1px; }
+  .tag-open  { background: var(--accent-soft); color: var(--accent); }
+  .tag-warn  { background: var(--warn-soft);   color: var(--warn); }
+  .tag-stop  { background: var(--stop-soft);   color: var(--stop); }
+  .tag-ok    { background: var(--ok-soft);     color: var(--ok); }
+
+  ol.steps { list-style: none; counter-reset: s; margin: 0; padding: 0; }
+  ol.steps > li { counter-increment: s; position: relative;
+                  padding: 0 0 22px 42px; }
+  ol.steps > li::before {
+    content: counter(s); position: absolute; left: 0; top: -1px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--line);
+    color: var(--ink-3); font-size: 12px; font-weight: 600;
+    display: grid; place-items: center;
+  }
+  ol.steps > li:not(:last-child)::after {
+    content: ""; position: absolute; left: 13px; top: 28px; bottom: 2px;
+    width: 1px; background: var(--line);
+  }
+  ol.steps > li:last-child { padding-bottom: 0; }
+  .step-head { font-weight: 550; margin-bottom: 4px; }
+  .who { font-size: 12px; color: var(--ink-3); margin-bottom: 6px; }
+  .who code { background: var(--line-soft); padding: 1px 6px; border-radius: 4px;
+              font-size: 11.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .expect { color: var(--ink-2); font-size: 14px; }
+  .expect strong { color: var(--ink); font-weight: 600; }
+
+  .note { margin-top: 10px; padding: 11px 14px; border-radius: 6px;
+          font-size: 13px; line-height: 1.55; }
+  .note-stop { background: var(--stop-soft); color: #6d2323;
+               border-left: 2px solid var(--stop); }
+  .note-warn { background: var(--warn-soft); color: #6d4714;
+               border-left: 2px solid var(--warn); }
+  .note-ok   { background: var(--ok-soft); color: #22543a;
+               border-left: 2px solid var(--ok); }
+  .note strong { font-weight: 650; }
+
+  h3.subhead { font-size: 13px; font-weight: 650; color: var(--ink);
+               margin: 0 0 10px; letter-spacing: -0.005em; }
+  h3.subhead + * { margin-top: 0; }
+  .block + .block { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line-soft); }
+  ul.tools { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  ul.tools li { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+                font-size: 12px; background: var(--line-soft); color: var(--ink-2);
+                padding: 4px 9px; border-radius: 5px; }
+  p.lead { margin: 0 0 4px; color: var(--ink-2); font-size: 14px; }
+  p.lead strong { color: var(--ink); font-weight: 600; }
+
+  table.actual-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.actual-table th { text-align: left; font-size: 11px; text-transform: uppercase;
+       letter-spacing: 0.06em; color: var(--ink-3); font-weight: 600;
+       padding: 0 10px 7px 0; border-bottom: 1px solid var(--line); }
+  table.actual-table td { padding: 9px 10px 9px 0; border-bottom: 1px solid var(--line-soft);
+       vertical-align: top; }
+  table.actual-table td code { background: var(--line-soft); padding: 1px 6px;
+       border-radius: 4px; font-size: 11.5px;
+       font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  table.ledger { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.ledger th { text-align: left; font-size: 11px; text-transform: uppercase;
+       letter-spacing: 0.06em; color: var(--ink-3); font-weight: 600;
+       padding: 0 10px 7px 0; border-bottom: 1px solid var(--line); }
+  table.ledger th.num, table.ledger td.num { text-align: right; padding-right: 0;
+       font-variant-numeric: tabular-nums; white-space: nowrap; }
+  table.ledger td { padding: 9px 10px 9px 0; border-bottom: 1px solid var(--line-soft); }
+  table.ledger tr.ledger-open td { color: var(--ink-3); }
+  table.ledger tr.ledger-none td { color: var(--ink-3); font-style: italic; }
+  table.ledger tr.ledger-close td { border-top: 1px solid var(--line);
+       border-bottom: 0; padding-top: 11px; }
+  .num.neg { color: var(--stop); }
+  .money { font-variant-numeric: tabular-nums; }
+  .money.strong, .strong { font-weight: 600; }
+
+  .empty { border: 1px dashed var(--line); border-radius: var(--radius);
+           padding: 40px 24px; text-align: center; color: var(--ink-3);
+           font-size: 14px; background: #fdfdfc; }
+  .empty p { margin: 0; }
+  .empty .hint { font-size: 12.5px; margin-top: 7px; color: #a3a09a; }
+
+  footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line);
+           color: var(--ink-3); font-size: 12.5px; }
+  footer code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Campus Customs — Desk Tickets</h1>
+  <p class="sub">What the multi-agent team is expected to do with each open ticket, and what it actually did.</p>
+  <dl class="meta">
+    <div><dt>Shop date</dt><dd>2026-08-31</dd></div>
+    <div><dt>Checking</dt><dd>$3,400.00</dd></div>
+    <div><dt>Open obligations</dt><dd>$3,240.00</dd></div>
+    <div><dt>Cash after obligations</dt><dd>$160.00</dd></div>
+    <div><dt>Open tickets</dt><dd>3</dd></div>
+  </dl>
+</header>
+
+<nav role="tablist">
+  <button role="tab" id="tab-101" aria-controls="p-101" aria-selected="true">Ticket 101</button>
+  <button role="tab" id="tab-102" aria-controls="p-102" aria-selected="false">Ticket 102</button>
+  <button role="tab" id="tab-103" aria-controls="p-103" aria-selected="false">Ticket 103</button>
+  <button role="tab" id="tab-cash" aria-controls="p-cash" aria-selected="false">Cash</button>
+  <button role="tab" id="tab-ref" aria-controls="p-ref" aria-selected="false">Reflections</button>
+</nav>
+
+<!-- ───────────────────────── 101 ───────────────────────── -->
+<div class="panel" id="p-101" role="tabpanel" aria-labelledby="tab-101">
+  <section>
+    <h2>Ticket</h2>
+    <div class="card">
+      <dl class="facts">
+        <div><dt>ID</dt><dd>101</dd></div>
+        <div><dt>Type</dt><dd>customer_order</dd></div>
+        <div><dt>Requester</dt><dd>Tauhid Zaman</dd></div>
+        <div><dt>Subject</dt><dd>Bulldog tee</dd></div>
+        <div><dt>SKU / size / qty</dt><dd>CC-TEE-WHITE · S · 1</dd></div>
+        <div><dt>In stock</dt><dd><span class="tag tag-stop">0 — shortfall 1</span></dd></div>
+        <div><dt>Linked invoice</dt><dd>501 · $840.00 · <span class="tag tag-stop">overdue 3 days</span></dd></div>
+        <div><dt>Status</dt><dd><span class="tag tag-open">open</span></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2>Expected</h2>
+    <div class="card">
+      <div class="block">
+        <h3 class="subhead">Who the Boss calls first, and why</h3>
+        <p class="lead"><strong>Customer Service</strong> to read the ticket, and <strong>Inventory</strong> to check whether we can fulfil the customer's demand — CC-TEE-WHITE, size S, quantity 1.</p>
+        <p class="expect">Without clarity from Inventory, the order cannot be progressed — and neither can a purchase order. Stock is the gate on everything downstream.</p>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">Delegations expected</h3>
+        <ol class="steps">
+          <li>
+            <div class="step-head">Inventory checks stock</div>
+            <div class="who">Inventory · <code>get_product_info</code></div>
+            <p class="expect">Can the order be filled from what is on the shelf?</p>
+          </li>
+          <li>
+            <div class="step-head">If stock exists — confirm and prepare</div>
+            <div class="who">Boss → Customer Service, Inventory</div>
+            <p class="expect">Customer Service confirms the order to the customer, and a <strong>purchase order is prepared for human approval</strong> before any transaction proceeds.</p>
+          </li>
+          <li>
+            <div class="step-head">If stock is 0 — Inventory reports back</div>
+            <div class="who">Inventory → Boss</div>
+            <p class="expect">Inventory tells the Boss it cannot fulfil, rather than guessing or improvising.</p>
+          </li>
+          <li>
+            <div class="step-head">Boss calls Inventory again — which vendor, and how fast</div>
+            <div class="who">Inventory · <code>get_vendor_info</code>, <code>suggest_vendor_for_sku</code></div>
+            <p class="expect">Figure out which vendor can restock, and the lead time.</p>
+          </li>
+          <li>
+            <div class="step-head">Accounting checks the money</div>
+            <div class="who">Accounting · <code>get_financial_info</code></div>
+            <p class="expect">Current cash, and how much this PO would cost — <strong>for a human to review before any payment</strong>.</p>
+          </li>
+          <li>
+            <div class="step-head">Customer Service drafts the reply</div>
+            <div class="who">Customer Service · <code>draft_customer_message</code></div>
+            <p class="expect">Tell the customer the product is unavailable and that it will be restocked soon — <strong>conditional on</strong> there being enough cash and a human deciding to pay.</p>
+          </li>
+          <li>
+            <div class="step-head">Close the ticket</div>
+            <div class="who">Customer Service · <code>update_ticket_status</code></div>
+            <p class="expect">Once the customer has been informed and has no further question or decision to make.</p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">MCP tools expected to run</h3>
+        <ul class="tools">
+          <li>get_ticket_info</li><li>get_product_info</li><li>get_vendor_info</li>
+          <li>suggest_vendor_for_sku</li><li>get_financial_info</li><li>draft_restock_po</li>
+          <li>draft_customer_message</li><li>update_ticket_status</li>
+        </ul>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">Where this meets the current system</h3>
+        <div class="note note-warn"><strong>Closing is the Boss's tool, not Customer Service's.</strong> <code>update_ticket_status</code> is scoped to the Boss. Customer Service holds <code>get_ticket_info</code> and <code>draft_customer_message</code> only. Expect Customer Service to report that the customer is settled, and the <em>Boss</em> to move the status.</div>
+        <div class="note note-warn"><strong>The PO is Inventory's to draft.</strong> <code>draft_restock_po</code> belongs to Inventory, not Customer Service — so "confirm the order and prepare the PO" is two agents, not one.</div>
+        <div class="note note-stop"><strong>This ticket cannot be closed on this run.</strong> Closing a <code>customer_order</code> requires stock to cover the request <em>and</em> no open linked invoice. Stock is 0 and invoice 501 is open, so the close is refused and the ticket should land on <strong>pending</strong>.</div>
+        <div class="note note-stop"><strong>Bulldog Print Co cannot ship.</strong> It holds open invoice 501 ($840.00, 3 days overdue), so <code>suggest_vendor_for_sku</code> will rank it first on specialty but flag it blocked, and <code>earliest_delivery</code> comes back null. The 5-day lead starts only once a human pays.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Actual</h2>
+    <div class="card">
+      <div class="block">
+        <h3 class="subhead">Who worked it, and with which tools</h3>
+        <table class="actual-table">
+          <thead><tr><th>Agent</th><th>MCP tools called</th></tr></thead>
+          <tbody>
+          <tr><td><strong>Boss</strong></td><td><code>get_ticket_info</code>, <code>update_ticket_status</code></td></tr>
+          <tr><td><strong>Inventory</strong></td><td><code>get_product_info</code>, <code>suggest_vendor_for_sku</code>, <code>draft_restock_po</code></td></tr>
+          <tr><td><strong>Customer Service</strong></td><td><code>get_ticket_info</code>, <code>draft_customer_message</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">Compared with Expected</h3>
+        <p class="lead"><strong>Ran as expected:</strong> 6 of the 8 expected tools, and the delegation order matched — Boss read the board, Inventory established the shortfall and drafted the order, Customer Service wrote the reply.</p>
+        <p class='lead'><strong>Expected but not observed in this run:</strong></p><ul class='tools'><li>get_vendor_info</li><li>get_financial_info</li></ul>
+        <div class="note note-ok"><strong>Both absences are explainable.</strong>
+        <code>suggest_vendor_for_sku</code> already returns each vendor's lead time and
+        whether it may ship, so Inventory had no reason to call
+        <code>get_vendor_info</code> separately. And the invoice status arrived with the
+        ticket itself from <code>get_ticket_info</code>, so Accounting was not needed —
+        which is why Accounting appears nowhere in this run.</div>
+        <div class="note note-ok"><strong>The prediction held:</strong> closing was the
+        Boss's tool, not Customer Service's, exactly as the Expected note warned.</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ───────────────────────── 102 ───────────────────────── -->
+<div class="panel" id="p-102" role="tabpanel" aria-labelledby="tab-102" hidden>
+  <section>
+    <h2>Ticket</h2>
+    <div class="card">
+      <dl class="facts">
+        <div><dt>ID</dt><dd>102</dd></div>
+        <div><dt>Type</dt><dd>rent_notice</dd></div>
+        <div><dt>Requester</dt><dd>Elm City Properties</dd></div>
+        <div><dt>Subject</dt><dd>Rent due</dd></div>
+        <div><dt>Linked lease</dt><dd>1 · Chapel Street shop</dd></div>
+        <div><dt>Monthly rent</dt><dd>$2,400.00</dd></div>
+        <div><dt>Next due</dt><dd>2026-09-02 · <span class="tag tag-warn">in 2 days</span></dd></div>
+        <div><dt>Status</dt><dd><span class="tag tag-open">open</span></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2>Expected</h2>
+    <div class="card">
+      <div class="block">
+        <h3 class="subhead">Who the Boss calls first, and why</h3>
+        <p class="lead"><strong>Facilities</strong>, to validate the rent details from the lease — the landlord, the amount, and when payment is due relative to today's date.</p>
+        <p class="expect">The lease is the source of the obligation, so it is established before anything else is decided.</p>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">Delegations expected</h3>
+        <ol class="steps">
+          <li>
+            <div class="step-head">Facilities validates the lease</div>
+            <div class="who">Facilities · <code>get_lease_info</code></div>
+            <p class="expect">Landlord, amount, and time to payment measured against today's date.</p>
+          </li>
+          <li>
+            <div class="step-head">Accounting states the amount and whether we can afford it</div>
+            <div class="who">Accounting · <code>get_financial_info</code></div>
+            <p class="expect">The amount due, and whether there is enough cash to pay it.</p>
+          </li>
+          <li>
+            <div class="step-head">Neither Accounting nor the Boss may pay</div>
+            <div class="who">— no tool exists</div>
+            <p class="expect">Accounting returns the information to the Boss; the Boss extends it to the human for review. <strong>No payment is made by anyone on the team.</strong></p>
+          </li>
+          <li>
+            <div class="step-head">After human review — draft to the landlord, if needed</div>
+            <div class="who">Facilities → Customer Service · <code>draft_customer_message</code></div>
+            <p class="expect">If the human asks for it, a message to the landlord is drafted. If payment has since been made by the human, a note informing them can also be drafted.</p>
+          </li>
+          <li>
+            <div class="step-head">Update the ticket — only after resolution is confirmed</div>
+            <div class="who">Boss · <code>update_ticket_status</code></div>
+            <p class="expect">Status moves only once the outcome is actually confirmed, not when the recommendation is written.</p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">MCP tools expected to run</h3>
+        <ul class="tools">
+          <li>get_ticket_info</li><li>get_lease_info</li>
+          <li>get_financial_info</li><li>draft_customer_message</li><li>update_ticket_status</li>
+        </ul>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">Where this meets the current system</h3>
+        <div class="note note-ok"><strong>This is a lease, not a vendor.</strong> Elm City Properties is a <em>landlord</em> recorded in <code>leases</code>; the <code>vendors</code> table holds Bulldog Print Co, Elm City Gifts and QuickShip CT — suppliers, and <em>Elm City Gifts is a different company</em> despite the similar name. <code>get_vendor_info</code> has therefore been removed from the expected tools for this ticket: <code>get_lease_info</code> is the lease equivalent and is already here.</div>
+        <div class="note note-warn"><strong>Drafting is Customer Service's tool, not Facilities'.</strong> Facilities holds <code>get_lease_info</code> only. A message to the landlord would be delegated to Customer Service, which owns <code>draft_customer_message</code>.</div>
+        <div class="note note-stop"><strong>Nothing is ever sent.</strong> A message to the landlord produces a draft on the board, returning <code>sent: false</code>. There is no send capability anywhere in the system, so a human sends it.</div>
+        <div class="note note-stop"><strong>This ticket cannot be closed on this run.</strong> Closing a <code>rent_notice</code> requires a rent payment recorded in <code>payments</code>, and no tool can create one. Expect the close to be refused and the ticket to land on <strong>pending</strong>. Your "only after resolution is confirmed" is exactly the rule the tool enforces.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Actual</h2>
+    <div class="card">
+      <div class="block">
+        <h3 class="subhead">Who worked it, and with which tools</h3>
+        <table class="actual-table">
+          <thead><tr><th>Agent</th><th>MCP tools called</th></tr></thead>
+          <tbody>
+          <tr><td><strong>Boss</strong></td><td><code>get_ticket_info</code></td></tr>
+          <tr><td><strong>Facilities</strong></td><td><code>get_lease_info</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">Compared with Expected</h3>
+        <p class="lead"><strong>Ran as expected:</strong> The first call and the routing — Boss read the board, Facilities validated the lease. Two agents, one round.</p>
+        <p class='lead'><strong>Expected but not observed in this run:</strong></p><ul class='tools'><li>get_financial_info</li><li>draft_customer_message</li><li>update_ticket_status</li></ul>
+        <div class="note note-warn"><strong>The shortest run of the three, and correctly so.</strong>
+        Rent is not overdue — it falls due 2026-09-02, two days out — so there was
+        nothing to escalate. The ticket stayed open because paying rent requires a
+        human, exactly as the Expected section predicted.</div>
+        <div class="note note-ok"><strong>Corrected before the run:</strong>
+        <code>get_vendor_info</code> was removed from this ticket's expected tools, since
+        Elm City Properties is a landlord in <code>leases</code> and not a vendor. It did
+        not appear in the actual run either.</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ───────────────────────── 103 ───────────────────────── -->
+<div class="panel" id="p-103" role="tabpanel" aria-labelledby="tab-103" hidden>
+  <section>
+    <h2>Ticket</h2>
+    <div class="card">
+      <dl class="facts">
+        <div><dt>ID</dt><dd>103</dd></div>
+        <div><dt>Type</dt><dd>price_override</dd></div>
+        <div><dt>Requester</dt><dd>Yale AI Club</dd></div>
+        <div><dt>Subject</dt><dd>Bulk hoodie discount</dd></div>
+        <div><dt>SKU / size / qty</dt><dd>CC-HOOD-NAVY · M · 20</dd></div>
+        <div><dt>In stock</dt><dd><span class="tag tag-warn">8 — shortfall 12</span></dd></div>
+        <div><dt>Cost / list</dt><dd>$22.00 / $58.00 · 62.1% margin</dd></div>
+        <div><dt>Status</dt><dd><span class="tag tag-open">open</span></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2>Expected</h2>
+    <div class="card">
+      <div class="block">
+        <h3 class="subhead">Who the Boss calls first, and why</h3>
+        <p class="lead">The Yale AI Club is requesting a bulk discount for 20 navy hoodies in size M. As with 101: <strong>Customer Service</strong> to read the ticket, and <strong>Inventory</strong> to check whether we can fulfil the demand.</p>
+        <p class="expect">Without clarity from Inventory, the order cannot be progressed — and neither can a purchase order.</p>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">Delegations expected</h3>
+        <ol class="steps">
+          <li>
+            <div class="step-head">Inventory checks stock</div>
+            <div class="who">Inventory · <code>get_product_info</code></div>
+            <p class="expect">Is there enough on the shelf for 20 in size M?</p>
+          </li>
+          <li>
+            <div class="step-head">If stock exists — confirm and prepare</div>
+            <div class="who">Boss → Customer Service, Inventory</div>
+            <p class="expect">Customer Service confirms the order; a purchase order is prepared for human approval before any transaction proceeds.</p>
+          </li>
+          <li>
+            <div class="step-head">If stock is not enough — Inventory reports back</div>
+            <div class="who">Inventory → Boss</div>
+            <p class="expect">Inventory tells the Boss the shortfall rather than improvising a workaround.</p>
+          </li>
+          <li>
+            <div class="step-head">Boss calls Inventory again — which vendor, and how fast</div>
+            <div class="who">Inventory · <code>get_vendor_info</code>, <code>suggest_vendor_for_sku</code>, <code>draft_restock_po</code></div>
+            <p class="expect">Which vendor can restock the shortfall, and the lead time.</p>
+          </li>
+          <li>
+            <div class="step-head">Accounting checks the money</div>
+            <div class="who">Accounting · <code>get_financial_info</code></div>
+            <p class="expect">Current cash, and what this PO would cost — for a human to review before any payment.</p>
+          </li>
+          <li>
+            <div class="step-head">At the same time — Accounting works the margin</div>
+            <div class="who">Accounting · <code>record_discount_decision</code></div>
+            <p class="expect">Calculate the profit margin on the proposed discount, analysing the impact on profitability. Accounting brings the result to the Boss, who extends it to the human for review.</p>
+          </li>
+          <li>
+            <div class="step-head">If the human agrees on pricing, the PO, and the payment</div>
+            <div class="who">Boss → Customer Service · <code>draft_customer_message</code></div>
+            <p class="expect">Draft a reply on availability and restock timing — <strong>conditional on</strong> enough cash, the human deciding to pay, <em>and</em> the human approving the pricing.</p>
+          </li>
+          <li>
+            <div class="step-head">Close the ticket</div>
+            <div class="who">Customer Service · <code>update_ticket_status</code></div>
+            <p class="expect">Once the customer has been informed and has no further question or decision to make.</p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">MCP tools expected to run</h3>
+        <ul class="tools">
+          <li>get_ticket_info</li><li>get_product_info</li><li>get_vendor_info</li>
+          <li>suggest_vendor_for_sku</li><li>get_financial_info</li><li>draft_restock_po</li>
+          <li>record_discount_decision</li><li>draft_customer_message</li><li>update_ticket_status</li>
+        </ul>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">Where this meets the current system</h3>
+        <div class="note note-stop"><strong>The restock cannot be funded.</strong> The 12-unit shortfall costs 12 x $22.00 = <strong>$264.00</strong>, but after rent ($2,400) and invoice 501 ($840) only <strong>$160.00</strong> remains. Expect <code>draft_restock_po</code> to come back flagged on <em>both</em> counts — vendor blocked <em>and</em> cash short — and still record the draft, because a human needs to see the blocked option.</div>
+        <div class="note note-warn"><strong>No target price was given.</strong> The ticket asks for "a bulk discount" without naming a figure, so <code>record_discount_decision</code> has no price to evaluate. Expect Accounting to report the missing figure rather than invent one. In an earlier trial run it instead recorded a proposal at list price — 0% off — which is a wasted row.</div>
+        <div class="note note-warn"><strong>Closing is the Boss's tool, not Customer Service's.</strong> As with 101, expect Customer Service to report the customer is settled and the Boss to move the status.</div>
+        <div class="note note-stop"><strong>This ticket cannot be closed on this run.</strong> Closing a <code>price_override</code> requires a price-override proposal carrying a human approver, and no tool can set <code>approved_by</code>. Expect a refusal and a landing status of <strong>pending</strong>.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Actual</h2>
+    <div class="card">
+      <div class="block">
+        <h3 class="subhead">Who worked it, and with which tools</h3>
+        <table class="actual-table">
+          <thead><tr><th>Agent</th><th>MCP tools called</th></tr></thead>
+          <tbody>
+          <tr><td><strong>Boss</strong></td><td><code>get_ticket_info</code>, <code>update_ticket_status</code></td></tr>
+          <tr><td><strong>Inventory</strong></td><td><code>get_product_info</code>, <code>suggest_vendor_for_sku</code>, <code>draft_restock_po</code></td></tr>
+          <tr><td><strong>Accounting</strong></td><td><code>get_product_info</code>, <code>get_financial_info</code>, <code>record_discount_decision</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">Compared with Expected</h3>
+        <p class="lead"><strong>Ran as expected:</strong> 7 of the 9 expected tools, including the two that matter most for this ticket — the restock draft and the margin decision.</p>
+        <p class='lead'><strong>Expected but not observed in this run:</strong></p><ul class='tools'><li>get_vendor_info</li><li>draft_customer_message</li></ul>
+        <div class="note note-ok"><strong>Accounting calling <code>get_product_info</code>
+        is the expected behaviour, not a stray call.</strong> Unit cost and list price live
+        in the <code>pricing</code> table, so the margin on a discount cannot be computed
+        without it — which is exactly why that tool is in Accounting's set as well as
+        Inventory's.</div>
+        <div class="note note-warn"><strong>No customer draft was written.</strong> The
+        discount had not been decided, so there was no answer to give the Yale AI Club
+        yet — and under the revised rules a draft is written only when there is something
+        final to say.</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ───────────────────────── Cash ───────────────────────── -->
+<div class="panel" id="p-cash" role="tabpanel" aria-labelledby="tab-cash" hidden>
+  <section>
+    <h2>Cash</h2>
+    <div class="card">
+      <dl class="facts">
+        <div><dt>Starting balance</dt><dd class="money">$3,400.00</dd></div>
+        <div><dt>Total paid out</dt><dd class="money">−$1,112.00</dd></div>
+        <div><dt>Ending balance</dt><dd class="money strong">$2,288.00</dd></div>
+        <div><dt>Payments made</dt><dd>3</dd></div>
+      </dl>
+      <p class="approval-note" style="margin-top:14px">
+        No revenue is modelled, so the balance only ever falls. Every figure below
+        was approved by a human — no agent can spend.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Every movement, in order</h2>
+    <div class="card">
+      <table class="ledger">
+        <thead>
+          <tr><th>#</th><th>Ticket</th><th>What</th><th class="num">Amount</th><th class="num">Balance</th></tr>
+        </thead>
+        <tbody>
+          <tr class="ledger-open">
+            <td>—</td><td>—</td><td>Starting balance after reset</td>
+            <td class="num">—</td><td class="num strong">$3,400.00</td>
+          </tr>
+          <tr>
+            <td>1</td><td>101</td>
+            <td>Pay invoice 501 — Bulldog Print Co, rush reprint</td>
+            <td class="num neg">−$840.00</td><td class="num">$2,560.00</td>
+          </tr>
+          <tr>
+            <td>2</td><td>101</td>
+            <td>Restock PO — 1 × CC-TEE-WHITE size S from Bulldog Print Co</td>
+            <td class="num neg">−$8.00</td><td class="num">$2,552.00</td>
+          </tr>
+          <tr>
+            <td>3</td><td>103</td>
+            <td>Restock PO — 12 × CC-HOOD-NAVY size M from Bulldog Print Co</td>
+            <td class="num neg">−$264.00</td><td class="num">$2,288.00</td>
+          </tr>
+          <tr class="ledger-none">
+            <td>—</td><td>102</td>
+            <td>No payment made — rent not executed</td>
+            <td class="num">$0.00</td><td class="num">$2,288.00</td>
+          </tr>
+          <tr class="ledger-close">
+            <td>—</td><td>—</td><td><strong>Ending balance</strong></td>
+            <td class="num neg"><strong>−$1,112.00</strong></td>
+            <td class="num strong"><strong>$2,288.00</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ticket by ticket</h2>
+
+    <div class="card">
+      <h3 class="subhead">Ticket 101 — customer order · <span class="money neg">−$848.00</span></h3>
+      <p class="expect">Two payments, and the order between them mattered.</p>
+      <ol class="steps">
+        <li>
+          <div class="step-head">Pay invoice 501 — $840.00</div>
+          <div class="who">invoice payment · human-approved</div>
+          <p class="expect">Bulldog Print Co held an open, overdue invoice, so under the
+          vendor rule it <strong>could not ship anything</strong>. Paying it was not
+          optional housekeeping — it was the gate on the whole ticket. Remaining:
+          <strong>$2,560.00</strong>.</p>
+        </li>
+        <li>
+          <div class="step-head">Restock purchase order — $8.00</div>
+          <div class="who">purchase order · human-approved</div>
+          <p class="expect">1 × CC-TEE-WHITE size S at $8.00 unit cost, to cover the
+          one-unit shortfall. Only possible <em>after</em> the invoice cleared.
+          Remaining: <strong>$2,552.00</strong>.</p>
+        </li>
+      </ol>
+      <div class="note note-ok">Ticket 101 cost <strong>$848.00</strong> in total, but
+      $840 of that was an existing debt rather than the cost of this order. The tee
+      itself cost $8.00.</div>
+    </div>
+
+    <div class="card">
+      <h3 class="subhead">Ticket 103 — price override · <span class="money neg">−$264.00</span></h3>
+      <ol class="steps">
+        <li>
+          <div class="step-head">Restock purchase order — $264.00</div>
+          <div class="who">purchase order · human-approved</div>
+          <p class="expect">12 × CC-HOOD-NAVY size M at $22.00 unit cost, covering the
+          shortfall against the Yale AI Club's request for 20. Remaining:
+          <strong>$2,288.00</strong>.</p>
+        </li>
+      </ol>
+      <div class="note note-ok">The approved discount — 20 hoodies at $52.00 against a
+      $58.00 list price — <strong>moved no cash</strong>. A price override authorises
+      what may be charged; it is not a payment. No revenue is modelled, so the sale
+      itself never appears in this ledger.</div>
+    </div>
+
+    <div class="card">
+      <h3 class="subhead">Ticket 102 — rent notice · <span class="money">$0.00</span></h3>
+      <p class="expect"><strong>Nothing was paid.</strong> Two independent reasons, and
+      either alone would have been enough.</p>
+      <ol class="steps">
+        <li>
+          <div class="step-head">The rent was not overdue</div>
+          <div class="who">lease 1 · Chapel Street shop</div>
+          <p class="expect">$2,400.00 due 2026-09-02, with the shop's operating date at
+          2026-08-31 — two days out. Nothing demanded settling it during this run.</p>
+        </li>
+        <li>
+          <div class="step-head">And there was no longer enough cash</div>
+          <div class="who">cash guard · business rule 5</div>
+          <p class="expect">This ticket was worked <strong>after</strong> 101 and 103, by
+          which point the balance had fallen to $2,288.00. Paying $2,400.00 would have
+          left <strong>−$112.00</strong>, and the balance may never go negative — so the
+          payment would have been <strong>refused</strong> even if someone had approved it.</p>
+        </li>
+      </ol>
+      <div class="note note-warn"><strong>Sequence decided this outcome.</strong> Had 102
+      been worked first, the rent was affordable: $3,400.00 − $2,400.00 = $1,000.00.
+      Paying it would then have left too little for ticket 101's $840.00 invoice, which
+      would have blocked Bulldog and stalled both apparel tickets. The three tickets
+      compete for one pot of money, and <strong>the order they are worked in changes
+      which of them can be resolved at all.</strong></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What never moved cash</h2>
+    <div class="card">
+      <table class="ledger">
+        <thead><tr><th>Item</th><th>Ticket</th><th>Why no cash moved</th></tr></thead>
+        <tbody>
+          <tr><td>Price override — 20 × CC-HOOD-NAVY at $52.00</td><td>103</td>
+              <td>Authorises a price. A sale would bring money <em>in</em>, and revenue is not modelled.</td></tr>
+          <tr><td>Customer draft to Tauhid Zaman</td><td>101</td>
+              <td>A message on the board. Nothing is ever sent, and messages cost nothing.</td></tr>
+          <tr><td>Rent — $2,400.00</td><td>102</td>
+              <td>Not due, and unaffordable by the time the ticket was worked.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<!-- ───────────────────────── Reflections ───────────────────────── -->
+<div class="panel" id="p-ref" role="tabpanel" aria-labelledby="tab-ref" hidden>
+
+  <section>
+    <h2>Part 1 — How would you evaluate the performance of the agents on each ticket, and why?</h2>
+    <div class="card">
+      <p class="expect">The performance of the agent, in my opinion, is relatively good,
+      although I faced a problem in my Problem 9 (as can be seen through the back-and-forth
+      prompts and bugs that I tried to fix).</p>
+
+      <div class="block">
+        <h3 class="subhead">Ticket 101 — the work stopped after human approval</h3>
+        <p class="expect">The biggest problem was how in Ticket 101 the agent did not
+        continue the work after a task was marked for human approval — meaning that after
+        the human's approval the task stopped, the Boss did not pick the approval up, and
+        the ticket could never be resolved. I vibe-coded an explanation that the agents
+        should pick the job up after human approval, which is the only way the task is
+        resolved.</p>
+        <p class="expect">The reason is that I did not write in detail when I vibe-coded
+        the looping mechanism after human approval. On reflection, I think there was a
+        confusion about post-approval: the agent prepares materials to approve and the
+        human approves — but <em>who pays</em>, the AI or the human? I brought this
+        confusion to a TA via chat and got a clarification that let me continue the work.</p>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">Ticket 101 — the customer email was too technical</h3>
+        <p class="expect">Another problem in 101 was that the Customer Service agent drafted
+        an email to the customer, Tauhid, that was very technical — something like "the
+        finance team has not made the payment, so no stock yet" — which I think is not
+        proper for a customer.</p>
+        <p class="expect">Luckily, Customer Service only <strong>drafted</strong> the email
+        and did not send it, as prompted, so I got the chance to review it and vibe-code the
+        improvements: hide all technical information, focus on a yes/no answer, and only
+        give a final response after all tasks have been completed.</p>
+        <div class="note note-ok"><strong>The safety rule earned its keep here.</strong>
+        "Nothing is ever sent" was what turned a bad message into a reviewable draft rather
+        than something a customer received.</div>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">Ticket 102 — refused to overspend</h3>
+        <p class="expect">For 102 the agent did the work very well: it refused to make any
+        payment because there was no cash balance after I had worked 101 and 103, exactly as
+        prompted. When I reset and did 102 first — so there was enough cash — the agent also
+        worked pretty well, although the task is relatively uncomplicated because the payment
+        is not due yet.</p>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">Ticket 103 — benefited from the 101 fix</h3>
+        <p class="expect">For 103, I suspect that if I had not vibe-coded and fixed the bug
+        in 101, then 103 would have had the same problem — the task stopping after human
+        approval. But it did not. 103 gives approval on both the discount and the order,
+        which I think is the right way.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Part 2 — For each ticket, how did Actual compare to the Expected plan?</h2>
+    <div class="card">
+      <p class="expect">Three evaluations, noted during the 9A run:</p>
+      <table class="actual-table">
+        <thead><tr><th>Ticket</th><th>Actual vs Expected</th></tr></thead>
+        <tbody>
+          <tr><td><strong>101</strong></td>
+              <td>Two tools were not called because their information was reportedly
+              available through other tools — <code>get_vendor_info</code> and
+              <code>get_financial_info</code>.</td></tr>
+          <tr><td><strong>102</strong></td>
+              <td>Only Boss and Facilities were needed, because the rent was not overdue.</td></tr>
+          <tr><td><strong>103</strong></td>
+              <td><em>Not yet written.</em></td></tr>
+        </tbody>
+      </table>
+
+      <div class="note note-warn"><strong>From the audit trail, for ticket 102.</strong> The
+      Boss's own recorded reason was that <em>"rent cannot be marked paid by this team"</em>
+      rather than that the rent was not overdue — Accounting was skipped because the
+      affordability question was moot, no agent being able to pay. The run also took
+      <strong>three rounds, not one</strong>: Facilities first looked up lease <strong>102</strong>
+      instead of lease <strong>1</strong>, returned <code>answered=false</code> with three
+      missing entries, and the Boss caught the error and re-delegated.</div>
+
+      <div class="note note-warn"><strong>Ticket 103's comparison is still blank.</strong>
+      From the Actual tab: 7 of 9 expected tools ran. <code>get_vendor_info</code> was not
+      needed because <code>suggest_vendor_for_sku</code> already returns lead time and ship
+      status, and no customer draft was written because the discount was still undecided —
+      there was nothing final to tell the Yale AI Club.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Part 3 — What would have been simpler as one agent with tools, and why?</h2>
+    <div class="card">
+      <p class="expect">Reflecting on Part 2: for Ticket 101, the information from the vendor
+      and financial tools was already accessible through other tools, thus reducing redundant
+      tool calls and coordination. I assume this makes the agents work more efficiently,
+      leading to cheaper cost and more efficient time.</p>
+      <p class="expect">For 102, although Boss and Facilities play the larger part in the
+      actual run — I had put Accounting in the expectation — I think it is wise to keep
+      Accounting too, especially when we have a more complicated ticket in the future.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Part 4 — Three new problems this agent team could solve with the tools built</h2>
+    <div class="card">
+      <ol class="steps">
+        <li>
+          <div class="step-head">Vendor dependency and outstanding obligations</div>
+          <div class="who">Accounting · <code>get_financial_info</code>, <code>get_vendor_info</code></div>
+          <p class="expect">Our agents can help assess a vendor's financial relationship with
+          Campus Customs, including outstanding payables and the total value of our
+          transactions with that vendor — identifying vendors Campus Customs depends on
+          heavily. This helps us understand the scale of the business relationship with each
+          vendor and identify outstanding financial obligations, supporting human
+          decision-making.</p>
+        </li>
+        <li>
+          <div class="step-head">Products tying up too much cash</div>
+          <div class="who">Inventory, Accounting · <code>get_product_info</code>, <code>get_financial_info</code></div>
+          <p class="expect">Our agents can help assess products with high inventory
+          investment, reviewing product information against available financial data. This
+          matters to prevent short cash flow and keep cash moving rather than sitting idle in
+          the warehouse.</p>
+        </li>
+        <li>
+          <div class="step-head">Products becoming less profitable</div>
+          <div class="who">Accounting · <code>get_product_info</code>, <code>get_financial_info</code></div>
+          <p class="expect">Reflecting on ticket 103, which included a discount, our agents
+          can help identify products that may be becoming less profitable — reviewing product
+          details against available financial records to surface concerns about product costs
+          and profitability. This helps Campus Customs decide which products need further
+          review and make better-informed business decisions.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <h2>Part 5 — Three problems this team could <em>not</em> solve, and what would be needed</h2>
+    <div class="card">
+
+      <div class="block">
+        <h3 class="subhead">1. Customer complaints and non-product questions</h3>
+        <p class="expect">I have not coded anything to support either, and the database to
+        work on this definitely needs to be developed.</p>
+        <p class="expect"><strong>Agents needed:</strong> more agents — for example a
+        <strong>Logistics agent</strong> for shipping complaints, alongside the existing
+        Customer Service — supplied with a database holding information on possible
+        complaints and non-product questions.</p>
+        <p class="expect"><strong>Tools needed:</strong></p>
+        <ul class="tools">
+          <li>get_order_status</li><li>track_shipment</li><li>get_complaint_history</li>
+          <li>search_faq_knowledge_base</li><li>create_complaint_ticket</li>
+          <li>update_complaint_status</li><li>get_resolution_options</li>
+          <li>draft_customer_response</li>
+        </ul>
+        <p class="expect" style="margin-top:10px">We should also make sure Customer Service
+        gives a proper response per complaint or question — reflecting the ticket 101 lesson
+        in Part 1, where the agent gave a very technical response to a customer.</p>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">2. Negotiation on rent, lease, vendor and other payments</h3>
+        <p class="expect">With our current tools the Accounting agent can only look at the
+        invoice and prepare materials for human approval. It cannot yet help with negotiation,
+        or with the data analysis that would help a human make that approval.</p>
+        <p class="expect"><strong>Agents needed:</strong> possibly a new <strong>Price &amp;
+        Market Comparison agent</strong>, or additional tools under Accounting.</p>
+        <p class="expect"><strong>Tools needed:</strong></p>
+        <ul class="tools">
+          <li>categorize_expenses</li><li>analyze_historical_expenses</li>
+          <li>compare_vendor_pricing</li><li>compare_expenses_with_market_rates</li>
+          <li>identify_cost_saving_opportunities</li><li>forecast_future_expenses</li>
+          <li>calculate_cost_impact</li><li>draft_vendor_negotiation_proposal</li>
+        </ul>
+        <p class="expect" style="margin-top:10px">We might also need to connect the agents to
+        external sources of data and analysis, such as Yahoo Finance.</p>
+        <div class="note note-warn"><strong>Note on safety rule 3.</strong> External data
+        sources would be the first break from "no private or external sources". Today no agent
+        has network access at all — the only toolset is a local server over one database. That
+        boundary would need rewriting deliberately, not incidentally.</div>
+      </div>
+
+      <div class="block">
+        <h3 class="subhead">3. Hidden or suspicious fees</h3>
+        <p class="expect">I am not sure whether the Accounting agent can spot hidden fees
+        right now. I think it could flag them when it prepares materials for human payment
+        review, but since we have not vibe-coded anything or added a tool here, I would add
+        it.</p>
+        <p class="expect"><strong>Tool needed:</strong> <code>detect_unexpected_charges</code>
+        — compare invoice line items against contract terms and expected fees, to flag
+        unexplained charges or potential hidden fees for human review before payment
+        approval.</p>
+        <div class="note note-stop"><strong>It cannot today, and the reason is structural.</strong>
+        The <code>invoices</code> table holds a single <code>amount</code> and a free-text
+        <code>description</code> — there are no line items to compare, and no contract terms
+        stored anywhere. This needs new tables before it can need a new tool.</div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<footer>
+  Campus Customs multi-agent operations · figures read from <code>data/campus_customs_new.db</code> at the shop date <code>2026-08-31</code>.
+  Standalone page — no server, no network.
+</footer>
+
+</div>
+<script>
+  (function () {
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+    function select(tab) {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      });
+      tab.focus();
+    }
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener('click', function () { select(tab); });
+      tab.addEventListener('keydown', function (e) {
+        var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        select(tabs[(i + d + tabs.length) % tabs.length]);
+      });
+    });
+  })();
+</script>
+</body>
+</html>

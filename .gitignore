@@ -1,0 +1,21 @@
+# Secrets — never commit. The Portkey key lives in a .env outside this folder;
+# .env.example documents the shape without the values.
+.env
+.env.local
+*.key
+*.pem
+token_cache.json
+
+# Environments and build output
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+frontend/dist/
+
+# OS
+.DS_Store
+
+# Both databases ARE tracked, deliberately:
+#   campus_customs.db          the pristine seed
+#   data/campus_customs_new.db the working copy, so a reader sees a real run's state

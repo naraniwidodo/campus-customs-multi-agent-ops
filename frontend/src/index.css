@@ -1,0 +1,211 @@
+/* Campus Customs dashboard.
+   White dominates; navy is an accent, used for the title bar and little else.
+   Text is black on white and white on navy, so contrast is never in question. */
+
+:root {
+  --navy: #000080;
+  --navy-soft: #f2f4fb;
+  --white: #ffffff;
+  --ink: #000000;
+  --ink-soft: #4a4a4a;
+  --ink-faint: #767676;
+  --line: #e2e2e6;
+  --line-strong: #c9c9d1;
+
+  /* Ticket state. Green resolved, yellow in progress, red unresolved. */
+  --ok: #1b7a3d;
+  --ok-bg: #eaf6ee;
+  --busy: #8a6a00;
+  --busy-bg: #fdf6e0;
+  --stop: #b3261e;
+  --stop-bg: #fdeceb;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--white);
+  color: var(--ink);
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  font-weight: 300;              /* Arial Light where available */
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-weight: 400; margin: 0; }
+button, input { font-family: inherit; font-size: inherit; font-weight: 300; }
+
+/* ── Title bar — the one solid navy surface, so its text is white ───────── */
+.topbar {
+  background: var(--navy);
+  color: var(--white);
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.topbar h1 { font-size: 19px; letter-spacing: 0.01em; color: var(--white); }
+.topbar .sub { font-size: 12.5px; color: #c7c7e8; margin-top: 2px; }
+
+.balance { text-align: right; }
+.balance .label {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.09em;
+  color: #c7c7e8;
+}
+.balance .value { font-size: 25px; font-weight: 400; color: var(--white); }
+.balance .value.changed { animation: flash 1.4s ease-out; }
+@keyframes flash {
+  0%, 30% { color: #ffd24a; }
+  100%    { color: var(--white); }
+}
+.balance .meta { font-size: 11.5px; color: #c7c7e8; }
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+.page { max-width: 1180px; margin: 0 auto; padding: 26px 28px 70px; }
+.cols { display: grid; grid-template-columns: 330px 1fr; gap: 26px; align-items: start; }
+@media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
+
+.section-title {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.09em;
+  color: var(--ink-faint); margin-bottom: 10px; font-weight: 400;
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 16px 18px;
+}
+.card + .card { margin-top: 12px; }
+
+/* ── Tickets ────────────────────────────────────────────────────────────── */
+.ticket {
+  width: 100%; text-align: left; cursor: pointer;
+  background: var(--white); border: 1px solid var(--line);
+  border-left: 3px solid var(--line-strong);
+  border-radius: 6px; padding: 13px 15px; margin-bottom: 10px;
+  display: block; transition: border-color .12s, background .12s;
+}
+.ticket:hover { border-color: var(--line-strong); background: #fcfcfd; }
+.ticket.selected { border-color: var(--navy); border-left-color: var(--navy); background: var(--navy-soft); }
+.ticket.state-ok   { border-left-color: var(--ok); }
+.ticket.state-busy { border-left-color: var(--busy); }
+.ticket.state-stop { border-left-color: var(--stop); }
+
+.ticket-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.ticket-id { font-size: 13px; color: var(--ink-faint); }
+.ticket-subject { font-size: 15px; color: var(--ink); margin-top: 3px; }
+.ticket-meta { font-size: 12.5px; color: var(--ink-soft); margin-top: 3px; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; letter-spacing: 0.02em;
+  padding: 3px 9px; border-radius: 11px; white-space: nowrap;
+}
+.badge .dot { width: 7px; height: 7px; border-radius: 50%; }
+.badge-ok   { background: var(--ok-bg);   color: var(--ok); }
+.badge-ok   .dot { background: var(--ok); }
+.badge-busy { background: var(--busy-bg); color: var(--busy); }
+.badge-busy .dot { background: var(--busy); animation: pulse 1.1s infinite; }
+.badge-stop { background: var(--stop-bg); color: var(--stop); }
+.badge-stop .dot { background: var(--stop); }
+@keyframes pulse { 50% { opacity: 0.25; } }
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+  background: var(--navy); color: var(--white); border: 1px solid var(--navy);
+  border-radius: 5px; padding: 8px 15px; cursor: pointer; transition: opacity .12s;
+}
+.btn:hover:not(:disabled) { opacity: 0.88; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-quiet { background: var(--white); color: var(--navy); }
+.btn-small { padding: 6px 12px; font-size: 13px; }
+
+.input {
+  border: 1px solid var(--line-strong); border-radius: 5px;
+  padding: 7px 10px; background: var(--white); color: var(--ink);
+}
+.input:focus { outline: 2px solid var(--navy); outline-offset: -1px; }
+
+/* ── Agent activity ─────────────────────────────────────────────────────── */
+.agent-row { padding: 13px 0; border-bottom: 1px solid var(--line); }
+.agent-row:last-child { border-bottom: 0; }
+.agent-head { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.agent-name {
+  background: var(--navy); color: var(--white);
+  font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 4px;
+}
+.agent-name.boss { background: var(--ink); }
+.round { font-size: 11.5px; color: var(--ink-faint); }
+.agent-summary { margin-top: 7px; color: var(--ink); font-size: 14px; }
+.tool-list { margin-top: 7px; display: flex; flex-wrap: wrap; gap: 5px; }
+.tool {
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px;
+  background: #f4f4f7; color: var(--ink-soft);
+  padding: 3px 8px; border-radius: 4px; border: 1px solid var(--line);
+}
+.tool.failed { background: var(--stop-bg); color: var(--stop); border-color: #f3c9c6; }
+.missing {
+  margin-top: 7px; font-size: 12.5px; color: var(--stop);
+  background: var(--stop-bg); border-radius: 4px; padding: 7px 10px;
+}
+.draft {
+  margin-top: 7px; font-size: 13px; color: var(--ink-soft);
+  background: #fafafb; border: 1px solid var(--line);
+  border-radius: 4px; padding: 9px 11px; white-space: pre-wrap;
+}
+.draft .draft-tag {
+  display: block; font-size: 10.5px; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--ink-faint); margin-bottom: 4px;
+}
+
+/* ── Approvals ──────────────────────────────────────────────────────────── */
+.approval { border: 1px solid var(--line); border-radius: 6px; padding: 13px 15px; margin-bottom: 10px; }
+.approval.spends { border-left: 3px solid var(--navy); }
+.approval-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.approval-amount { font-size: 17px; white-space: nowrap; }
+.approval-note { font-size: 12.5px; color: var(--ink-soft); margin-top: 4px; }
+.approval-actions { margin-top: 11px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.error {
+  margin-top: 9px; font-size: 13px; color: var(--stop);
+  background: var(--stop-bg); border: 1px solid #f3c9c6;
+  border-radius: 5px; padding: 9px 11px;
+}
+.success {
+  margin-top: 9px; font-size: 13px; color: var(--ok);
+  background: var(--ok-bg); border: 1px solid #c6e3d0;
+  border-radius: 5px; padding: 9px 11px;
+}
+
+.empty { color: var(--ink-faint); font-size: 13.5px; padding: 22px 0; text-align: center; }
+.answer { font-size: 14px; color: var(--ink); white-space: pre-wrap; }
+.kv { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin-top: 8px; }
+
+/* ── Ticket workspace: the ticket's own work on the left, the approvals it
+      produced on the right. Standing obligations stay in the main queue below. */
+.ticket-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+.ticket-side { position: sticky; top: 16px; }
+@media (max-width: 1100px) {
+  .ticket-grid { grid-template-columns: 1fr; }
+  .ticket-side { position: static; }
+}
+
+.run-divider {
+  font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink-faint); text-align: center; margin: 2px 0 12px;
+}
+
+.closed-by { font-size: 11px; color: var(--ink-faint); margin-top: 5px; }
+.reconciled {
+  font-size: 12.5px; color: var(--ok); background: var(--ok-bg);
+  border: 1px solid #c6e3d0; border-radius: 5px;
+  padding: 9px 11px; margin-bottom: 11px;
+}

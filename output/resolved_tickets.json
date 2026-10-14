@@ -1,0 +1,203 @@
+{
+  "title": "Campus Customs \u2014 resolved tickets",
+  "problem": "Homework 5, Problem 9B",
+  "recorded_on": "2026-10-13",
+  "shop_date": "2026-08-31",
+  "what_this_records": "The outcome of the Problem 9A run of all three tickets. Agent and tool facts are read from output/audit_trail.json for the run ids named below; outcomes and human approvals are the operator's own account from the dashboard.",
+  "note_on_live_database": "data/campus_customs_new.db has since been reset and partially re-run, so it no longer matches this record \u2014 at the time of writing it showed tickets 101 and 103 as pending with one payment. That is expected: the database is working state, while the audit trail is append-only and still holds all three runs recorded here. This file documents the 9A run, not the current contents of the database.",
+  "cash": {
+    "starting_balance": 3400.0,
+    "ending_balance": 2288.0,
+    "total_paid_out": 1112.0,
+    "payments_made": 3,
+    "note": "No revenue is modelled, so the balance only ever falls."
+  },
+  "tickets": [
+    {
+      "id": 101,
+      "type": "customer_order",
+      "requester": "Tauhid Zaman",
+      "subject": "Bulldog tee",
+      "final_status": "closed",
+      "resolved": true,
+      "run_id": "0290fa098abb",
+      "short_outcome": "Resolved. The size S tee was out of stock and the vendor was blocked by an overdue invoice. After the invoice was paid and a one-unit restock was approved and delivered, stock covered the order and the ticket closed.",
+      "outcome_detail": [
+        "Inventory: 1 unit reported in stock.",
+        "Accounting / payment outcome: invoice 501 reported paid.",
+        "Customer Service: ticket reported closed after payment."
+      ],
+      "agent_contributions": {
+        "inventory": "Participated in the latest recorded run and reported stock availability.",
+        "customer_service": "Participated in the latest run, which reported the ticket closed."
+      },
+      "human_approvals": [
+        {
+          "what": "Pay invoice 501",
+          "detail": "Bulldog Print Co \u00b7 due 2026-08-28 \u00b7 Rush reprint CC-TEE-WHITE S",
+          "kind": "invoice_payment",
+          "amount": 840.0,
+          "moved_cash": true
+        },
+        {
+          "what": "Restock purchase order",
+          "detail": "1 x CC-TEE-WHITE size S from Bulldog Print Co",
+          "kind": "purchase_order",
+          "amount": 8.0,
+          "moved_cash": true
+        },
+        {
+          "what": "Customer message to Tauhid Zaman",
+          "detail": "Draft released for a human to send; nothing was sent by the system",
+          "kind": "customer_draft",
+          "amount": null,
+          "moved_cash": false
+        }
+      ],
+      "cash_effect": {
+        "total": -848.0,
+        "note": "Of this, $840.00 settled a pre-existing debt rather than the cost of the order. The tee itself cost $8.00."
+      },
+      "run_evidence": {
+        "records": 9,
+        "rounds": 2,
+        "delegations": 2,
+        "elapsed_seconds": 12.9,
+        "agents_in_run": [
+          "inventory",
+          "customer_service"
+        ],
+        "tools_called": {
+          "get_product_info": [
+            "inventory"
+          ],
+          "get_ticket_info": [
+            "boss",
+            "customer_service"
+          ],
+          "update_ticket_status": [
+            "boss"
+          ]
+        }
+      }
+    },
+    {
+      "id": 102,
+      "type": "rent_notice",
+      "requester": "Elm City Properties",
+      "subject": "Rent due",
+      "final_status": "open",
+      "resolved": false,
+      "run_id": "9be63412d1e1",
+      "short_outcome": "Not resolved, and correctly so. Rent of $2,400.00 was not overdue, and because this ticket was worked after 101 and 103 the balance had fallen to $2,288.00 \u2014 paying would have left -$112.00, which the system refuses.",
+      "outcome_detail": [
+        "Facilities initially looked up lease ID 102 instead of the correct lease ID 1.",
+        "The initial lookup produced three missing entries.",
+        "Boss recognised the error and re-delegated the task.",
+        "Facilities then identified the correct lease information: $2,400 due on October 2, 2026.",
+        "The latest reported working database state still showed the ticket as open."
+      ],
+      "agent_contributions": {
+        "facilities": "Made the initial incorrect lookup, then retrieved the correct lease information.",
+        "boss": "Identified the lookup error and re-delegated the task."
+      },
+      "human_approvals": [],
+      "human_approvals_note": "None recorded. Had rent been paid it would have required a human approval first \u2014 no agent can pay, and the system has no tool that would allow one to.",
+      "cash_effect": {
+        "total": 0.0,
+        "note": "Two independent reasons, either sufficient on its own: the rent was not overdue, and by the time this ticket was worked the balance could not cover it. Had 102 been worked first the rent was affordable, but paying it would have left too little for ticket 101's $840.00 invoice \u2014 which would have kept the vendor blocked and stalled both apparel tickets. The order the tickets are worked in changes which can be resolved."
+      },
+      "run_evidence": {
+        "records": 10,
+        "rounds": 3,
+        "delegations": 2,
+        "elapsed_seconds": 38.02,
+        "agents_in_run": [
+          "facilities"
+        ],
+        "tools_called": {
+          "get_lease_info": [
+            "facilities"
+          ],
+          "get_ticket_info": [
+            "boss"
+          ],
+          "update_ticket_status": [
+            "boss"
+          ]
+        }
+      }
+    },
+    {
+      "id": 103,
+      "type": "price_override",
+      "requester": "Yale AI Club",
+      "subject": "Bulk hoodie discount",
+      "final_status": "closed",
+      "resolved": true,
+      "run_id": "e2e07d5493fe",
+      "short_outcome": "Resolved. A 12-unit shortfall was covered by an approved restock, and a discounted price of $52.00 against the $58.00 list price was approved. Stock then covered the request for 20 and the ticket closed.",
+      "outcome_detail": [
+        "Inventory: 20 hoodies reported in stock.",
+        "Pricing: proposed price of $52 compared with the $58 list price.",
+        "The latest run reported the ticket as closed."
+      ],
+      "agent_contributions": {
+        "accounting": "Participated in the run concerning the proposed $52 price.",
+        "inventory": "Participated in the run and reported 20 hoodies in stock."
+      },
+      "human_approvals": [
+        {
+          "what": "Restock purchase order",
+          "detail": "12 x CC-HOOD-NAVY size M from Bulldog Print Co",
+          "kind": "purchase_order",
+          "amount": 264.0,
+          "moved_cash": true
+        },
+        {
+          "what": "Price override",
+          "detail": "20 x CC-HOOD-NAVY at $52.00 (list $58.00, 10.3% off)",
+          "kind": "price_override",
+          "amount": 1040.0,
+          "moved_cash": false
+        }
+      ],
+      "cash_effect": {
+        "total": -264.0,
+        "note": "Only the restock moved cash. The price override authorises what may be charged; it is not a payment, and since no revenue is modelled the sale never appears."
+      },
+      "run_evidence": {
+        "records": 9,
+        "rounds": 2,
+        "delegations": 2,
+        "elapsed_seconds": 22.56,
+        "agents_in_run": [
+          "accounting",
+          "inventory"
+        ],
+        "tools_called": {
+          "get_product_info": [
+            "accounting",
+            "inventory"
+          ],
+          "get_ticket_info": [
+            "boss"
+          ],
+          "update_ticket_status": [
+            "boss"
+          ]
+        }
+      }
+    }
+  ],
+  "summary": {
+    "tickets_total": 3,
+    "resolved": 2,
+    "unresolved": 1,
+    "human_approvals_total": 5,
+    "approvals_that_moved_cash": 3,
+    "approvals_that_moved_no_cash": 2,
+    "agent_initiated_payments": 0,
+    "note": "No agent made a payment, placed an order, applied a price or sent a message. Every cash movement required a named human approver."
+  }
+}

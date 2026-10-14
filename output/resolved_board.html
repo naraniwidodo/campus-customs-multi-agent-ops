@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Customs — Resolved Board</title>
+<style>
+  :root {
+    --navy:#000080; --white:#fff; --ink:#000; --ink-2:#4a4a4a; --ink-3:#767676;
+    --line:#e2e2e6; --line-soft:#f1f1f4;
+    --ok:#1b7a3d; --ok-bg:#eaf6ee; --stop:#b3261e; --stop-bg:#fdeceb;
+    --warn:#8a6a00; --warn-bg:#fdf6e0;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--white); color:var(--ink);
+         font-family:Arial,"Helvetica Neue",Helvetica,sans-serif; font-weight:300;
+         font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased; }
+  .topbar { background:var(--navy); color:var(--white); padding:20px 30px; }
+  .topbar h1 { margin:0; font-size:20px; font-weight:400; }
+  .topbar p { margin:3px 0 0; font-size:13px; color:#c7c7e8; }
+  .wrap { max-width:980px; margin:0 auto; padding:28px 30px 80px; }
+
+  h2 { font-size:11px; text-transform:uppercase; letter-spacing:.08em;
+        color:var(--ink-3); font-weight:600; margin:0 0 12px; }
+  section + section { margin-top:42px; }
+  .card { border:1px solid var(--line); border-radius:7px; padding:20px 22px; }
+
+  .summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+              gap:18px; }
+  .summary dt { font-size:10.5px; text-transform:uppercase; letter-spacing:.07em;
+                 color:var(--ink-3); margin-bottom:3px; }
+  .summary dd { margin:0; font-size:19px; font-variant-numeric:tabular-nums; }
+
+  .tkt-head { display:flex; justify-content:space-between; align-items:flex-start;
+               gap:16px; flex-wrap:wrap; margin-bottom:4px; }
+  .tkt-head h3 { margin:0; font-size:19px; font-weight:400; }
+  .tkt-sub { color:var(--ink-3); font-size:13px; }
+  .badge { display:inline-flex; align-items:center; gap:6px; font-size:11.5px;
+            padding:4px 11px; border-radius:12px; white-space:nowrap; }
+  .badge .dot { width:7px; height:7px; border-radius:50%; }
+  .ok { background:var(--ok-bg); color:var(--ok); } .ok .dot { background:var(--ok); }
+  .no { background:var(--stop-bg); color:var(--stop); } .no .dot { background:var(--stop); }
+  .closed-by { font-size:11px; color:var(--ink-3); text-align:right; margin-top:4px; }
+
+  .outcome { margin:14px 0 0; color:var(--ink); }
+  table.kv { width:100%; border-collapse:collapse; font-size:14px; margin-top:14px; }
+  table.kv th { text-align:left; font-size:10.5px; text-transform:uppercase;
+       letter-spacing:.06em; color:var(--ink-3); font-weight:600;
+       padding:0 10px 6px 0; border-bottom:1px solid var(--line); }
+  table.kv td { padding:8px 10px 8px 0; border-bottom:1px solid var(--line-soft);
+                 vertical-align:top; }
+  table.kv td.num { text-align:right; padding-right:0; font-variant-numeric:tabular-nums;
+                     white-space:nowrap; }
+  .moved { color:var(--stop); } .nomove { color:var(--ink-3); }
+
+  .shots { margin-top:20px; display:grid; gap:20px; }
+  figure.shot { margin:0; border:1px solid var(--line); border-radius:7px;
+                 overflow:hidden; background:#fcfcfd; }
+  figure.shot img { display:block; width:100%; height:auto; }
+  figcaption { font-size:12px; color:var(--ink-2); padding:9px 13px;
+                border-top:1px solid var(--line); background:var(--white); }
+  .hash { color:#a9a9b0; font-family:ui-monospace,Menlo,monospace; font-size:10.5px;
+           float:right; }
+
+  .note { margin-top:14px; padding:11px 14px; border-radius:6px; font-size:13.5px; }
+  .note-ok { background:var(--ok-bg); color:#1a5c31; border-left:2px solid var(--ok); }
+  .note-warn { background:var(--warn-bg); color:#6d4714; border-left:2px solid var(--warn); }
+  .note-stop { background:var(--stop-bg); color:#6d2323; border-left:2px solid var(--stop); }
+  footer { margin-top:56px; padding-top:18px; border-top:1px solid var(--line);
+            color:var(--ink-3); font-size:12.5px; }
+  code { background:var(--line-soft); padding:1px 6px; border-radius:4px;
+          font-family:ui-monospace,Menlo,monospace; font-size:11.5px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Campus Customs — Resolved Board</h1>
+  <p>Screenshot evidence from the Problem 9A run · shop date 2026-08-31</p>
+</div>
+
+<div class="wrap">
+
+<section>
+  <h2>Result</h2>
+  <div class="card">
+    <dl class="summary">
+      <div><dt>Tickets</dt><dd>3</dd></div>
+      <div><dt>Resolved</dt><dd style="color:var(--ok)">2</dd></div>
+      <div><dt>Not resolved</dt><dd style="color:var(--stop)">1</dd></div>
+      <div><dt>Starting cash</dt><dd>$3,400.00</dd></div>
+      <div><dt>Ending cash</dt><dd>$2,288.00</dd></div>
+      <div><dt>Human approvals</dt><dd>5</dd></div>
+    </dl>
+    <div class="note note-ok"><strong>No agent spent money.</strong> All
+    3 payments carry a named human approver, and two of the five approvals —
+    the price override and the customer draft — moved no cash at all.</div>
+  </div>
+</section>
+
+<section>
+  <h2>Ticket 101 — customer order</h2>
+  <div class="card">
+    <div class="tkt-head">
+      <div>
+        <h3>Bulldog tee</h3>
+        <div class="tkt-sub">Tauhid Zaman · CC-TEE-WHITE · size S · qty 1</div>
+      </div>
+      <div>
+        <span class="badge ok"><span class="dot"></span>Resolved</span>
+        <div class="closed-by">closed by the agent team</div>
+      </div>
+    </div>
+
+    <p class="outcome">Stock was <strong>0</strong> and the vendor could not ship, because
+    Bulldog Print Co held an overdue invoice. Paying that invoice unblocked the vendor; a
+    one-unit restock was then approved, paid for and confirmed as delivered. Stock reached
+    1, which covered the order, and the ticket closed.</p>
+
+    <table class="kv">
+      <thead><tr><th>Human approval</th><th>Detail</th><th class="num">Cash</th></tr></thead>
+      <tbody>
+        <tr><td>Pay invoice 501</td><td>Bulldog Print Co · rush reprint</td>
+            <td class="num moved">−$840.00</td></tr>
+        <tr><td>Restock purchase order</td><td>1 × CC-TEE-WHITE size S</td>
+            <td class="num moved">−$8.00</td></tr>
+        <tr><td>Confirm delivery</td><td>stock 0 → 1</td>
+            <td class="num nomove">—</td></tr>
+        <tr><td>Customer message</td><td>draft released for a human to send</td>
+            <td class="num nomove">$0.00</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note note-ok"><strong>$840 of the $848 settled an existing debt</strong>
+    rather than paying for this order. The tee itself cost $8.00.</div>
+
+    <div class="shots">
+        <figure class="shot">
+          <img src="evidence/ticket101_board.png" alt="Ticket 101 resolved — board, conclusion and approval panel" loading="lazy">
+          <figcaption>Ticket 101 resolved — board, conclusion and approval panel <span class="hash">sha256 423b154a07c2355c…</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="evidence/ticket101_activity_1.png" alt="Agent activity — Boss routes, Inventory finds the shortfall and drafts the order" loading="lazy">
+          <figcaption>Agent activity — Boss routes, Inventory finds the shortfall and drafts the order <span class="hash">sha256 86577318c84e6046…</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="evidence/ticket101_activity_2.png" alt="Agent activity — stock confirmed after delivery, customer draft saved and not sent" loading="lazy">
+          <figcaption>Agent activity — stock confirmed after delivery, customer draft saved and not sent <span class="hash">sha256 a5e7d639110bad08…</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="evidence/ticket101_activity_3.png" alt="Agent activity — Boss verifies and closes the ticket" loading="lazy">
+          <figcaption>Agent activity — Boss verifies and closes the ticket <span class="hash">sha256 a7f5587d60f848d5…</span></figcaption>
+        </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Ticket 103 — price override</h2>
+  <div class="card">
+    <div class="tkt-head">
+      <div>
+        <h3>Bulk hoodie discount</h3>
+        <div class="tkt-sub">Yale AI Club · CC-HOOD-NAVY · size M · qty 20</div>
+      </div>
+      <div>
+        <span class="badge ok"><span class="dot"></span>Resolved</span>
+        <div class="closed-by">closed by the agent team</div>
+      </div>
+    </div>
+
+    <p class="outcome">Stock was <strong>8</strong> against a request for 20 — short by 12.
+    Inventory drafted a restock for the shortfall and Accounting recorded a proposed price
+    of <strong>$52.00</strong> against the <strong>$58.00</strong> list price. Both needed a
+    human. Once the restock was approved, paid for and delivered, stock reached 20, the
+    discount was approved, and the ticket closed.</p>
+
+    <table class="kv">
+      <thead><tr><th>Human approval</th><th>Detail</th><th class="num">Cash</th></tr></thead>
+      <tbody>
+        <tr><td>Restock purchase order</td><td>12 × CC-HOOD-NAVY size M</td>
+            <td class="num moved">−$264.00</td></tr>
+        <tr><td>Confirm delivery</td><td>stock 8 → 20</td>
+            <td class="num nomove">—</td></tr>
+        <tr><td>Price override</td><td>20 × CC-HOOD-NAVY at $52.00 (10.3% off list)</td>
+            <td class="num nomove">$0.00</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note note-ok"><strong>The discount moved no cash.</strong> A price override
+    authorises what may be charged; it is not a payment. No revenue is modelled, so the sale
+    itself never appears in the ledger.</div>
+
+    <div class="shots">
+        <figure class="shot">
+          <img src="evidence/ticket103_board.png" alt="Ticket 103 resolved — board, conclusion and approval panel" loading="lazy">
+          <figcaption>Ticket 103 resolved — board, conclusion and approval panel <span class="hash">sha256 34a92be3cf61cc49…</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="evidence/ticket103_activity_1.png" alt="Agent activity — Inventory finds the 12-unit shortfall, Accounting records the proposed price" loading="lazy">
+          <figcaption>Agent activity — Inventory finds the 12-unit shortfall, Accounting records the proposed price <span class="hash">sha256 fe21561202aa1e34…</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="evidence/ticket103_activity_2.png" alt="Agent activity — the run resumes after each human approval" loading="lazy">
+          <figcaption>Agent activity — the run resumes after each human approval <span class="hash">sha256 4ee9f695711a7f39…</span></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="evidence/ticket103_activity_3.png" alt="Agent activity — stock confirmed at 20, Boss closes the ticket" loading="lazy">
+          <figcaption>Agent activity — stock confirmed at 20, Boss closes the ticket <span class="hash">sha256 11d34efe37910b76…</span></figcaption>
+        </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Ticket 102 — rent notice</h2>
+  <div class="card">
+    <div class="tkt-head">
+      <div>
+        <h3>Rent due</h3>
+        <div class="tkt-sub">Elm City Properties · Chapel Street shop · $2,400.00</div>
+      </div>
+      <span class="badge no"><span class="dot"></span>Not resolved</span>
+    </div>
+
+    <p class="outcome"><strong>Left open deliberately.</strong> Facilities confirmed the
+    lease — $2,400.00 due 2026-09-02, two days after the shop's operating date, so not
+    overdue. Nothing was paid, and the ticket cannot close until a rent payment is recorded.</p>
+
+    <table class="kv">
+      <thead><tr><th>Human approval</th><th>Detail</th><th class="num">Cash</th></tr></thead>
+      <tbody>
+        <tr><td colspan="2" class="nomove">None — no payment was made</td>
+            <td class="num nomove">$0.00</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note note-stop"><strong>Two independent reasons, either sufficient alone.</strong>
+    The rent was not overdue; and because this ticket was worked after 101 and 103, the balance
+    had fallen to $2,288.00 — paying $2,400.00 would have left <strong>−$112.00</strong>,
+    which the cash guard refuses.</div>
+
+    <div class="note note-warn"><strong>Sequence decided this.</strong> Had 102 been worked
+    first, the rent was affordable: $3,400.00 − $2,400.00 = $1,000.00. But that would have
+    left too little for ticket 101's $840.00 invoice, keeping the vendor blocked and stalling
+    both apparel tickets. The three tickets compete for one pot of money, so the order they
+    are worked in changes which of them can be resolved at all.</div>
+
+    <div class="note note-ok"><strong>This is the system working.</strong> A red badge here is
+    the correct result, not a failure: no agent can pay rent, and the one remaining obligation
+    is visible and waiting for a human.</div>
+  </div>
+</section>
+
+<footer>
+  Screenshots captured from the live dashboard at <code>http://localhost:5173</code> and
+  stored in <code>output/evidence/</code>. Each carries its SHA-256 prefix so an image cannot
+  be swapped without this record disagreeing. Open this file from the <code>output/</code>
+  folder so the image paths resolve.
+  Full per-run detail is in <code>output/resolved_tickets.json</code>; the complete machine
+  record is <code>output/audit_trail.json</code>.
+</footer>
+
+</div>
+</body>
+</html>

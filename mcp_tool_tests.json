@@ -1,0 +1,393 @@
+{
+  "title": "Campus Customs \u2014 MCP tool test evidence",
+  "problem": "Homework 5, Problem 4B",
+  "recorded_on": "2026-10-06",
+  "environment": {
+    "mcp_server": "campus-customs-ops",
+    "framework": "FastMCP",
+    "transport": "stdio",
+    "connection_status": "connected",
+    "tool_count": 3,
+    "database_under_test": "data/campus_customs_new.db",
+    "database_sha256": "23686a90d698f7fa6f901a3f0a9774db9cbb31e13151c9e5717275f3321f360a",
+    "seed_database": "campus_customs.db (untouched)",
+    "shop_operating_date": "2026-08-31",
+    "date_source": "desk.date_today \u2014 business rule 1; no tool reads the system clock"
+  },
+  "prompts": [
+    {
+      "label": "Prompt 1",
+      "text": "Can you check if the MCP server is actually configured & connected & you Claude can see all tools?"
+    },
+    {
+      "label": "Prompt 2",
+      "text": "Okay 4B: This problem asks me to test the MCP tool individually with your help.\n\n1. get_product_info\n2. get_financial_info\n3. get_lease_info\n\nFor each tool:\n\n* Call the actual MCP tool.\n* Use a valid test input based on the db file we use for campus custom\n* Show me the exact input & response, I want to see in details & want to know if the tool success or not\n\nAfter testing all three tools, create a JSON file named mcp_tool_tests.json in the project containing the test evidence for all three tools. I want to add the tool's name, the output (which hopefully matches the data/campus_customs_new.db value), and the result + proof. Anyway let's think of this JSON file later, just call the each tool first.\nDon't invent anything or guess. If you are not sure, ask me. If the tool is not working, that's ok, just let me know"
+    }
+  ],
+  "method": "Each tool was called live over MCP. Every returned field was then compared against the working-copy database, and every derived field recomputed independently. The 'database' values in this file were read from data/campus_customs_new.db at the time this file was written, not transcribed by hand.",
+  "tests": [
+    {
+      "test_id": 1,
+      "tool": "get_product_info",
+      "serves_ticket": [
+        101,
+        103
+      ],
+      "input_used": {
+        "sku": "CC-HOOD-NAVY",
+        "size": "M",
+        "requested_qty": 20
+      },
+      "input_rationale": "Ticket 103's exact ask \u2014 20 navy hoodies, size M.",
+      "output": {
+        "as_of": "2026-08-31",
+        "matched": 1,
+        "products": [
+          {
+            "sku": "CC-HOOD-NAVY",
+            "name": "Basic Hoodie Big Yale",
+            "unit_cost": 22,
+            "list_price": 58,
+            "unit_margin": 36,
+            "margin_pct": 62.1,
+            "sizes": [
+              {
+                "size": "M",
+                "qty": 8,
+                "location": "Aisle A",
+                "in_stock": true
+              }
+            ],
+            "total_qty": 8,
+            "request": {
+              "size": "M",
+              "requested_qty": 20,
+              "available_qty": 8,
+              "shortfall": 12,
+              "can_fulfil_from_stock": false
+            }
+          }
+        ]
+      },
+      "verification": [
+        {
+          "field": "name",
+          "returned": "Basic Hoodie Big Yale",
+          "database": "Basic Hoodie Big Yale",
+          "match": true
+        },
+        {
+          "field": "unit_cost",
+          "returned": 22,
+          "database": 22.0,
+          "match": true
+        },
+        {
+          "field": "list_price",
+          "returned": 58,
+          "database": 58.0,
+          "match": true
+        },
+        {
+          "field": "qty",
+          "returned": 8,
+          "database": 8,
+          "match": true
+        },
+        {
+          "field": "location",
+          "returned": "Aisle A",
+          "database": "Aisle A",
+          "match": true
+        },
+        {
+          "field": "unit_margin",
+          "returned": 36,
+          "database": 36.0,
+          "match": true,
+          "derivation": "list_price - unit_cost"
+        },
+        {
+          "field": "margin_pct",
+          "returned": 62.1,
+          "database": 62.1,
+          "match": true,
+          "derivation": "(list_price - unit_cost) / list_price * 100"
+        },
+        {
+          "field": "shortfall",
+          "returned": 12,
+          "database": 12,
+          "match": true,
+          "derivation": "requested_qty - available_qty"
+        },
+        {
+          "field": "as_of",
+          "returned": "2026-08-31",
+          "database": "2026-08-31",
+          "match": true,
+          "derivation": "desk.date_today (business rule 1)"
+        }
+      ],
+      "proof": {
+        "screenshot": "output/evidence/test1_get_product_info.png",
+        "screenshot_sha256": "277b3759efbec4c7aef85a95613e84daf19a36e61d4705ed340f64080120a42c",
+        "db_query": "SELECT i.name,i.size,i.qty,i.location,p.unit_cost,p.list_price FROM inventory i JOIN pricing p ON p.sku=i.sku WHERE i.sku='CC-HOOD-NAVY' AND i.size='M'",
+        "db_result": {
+          "name": "Basic Hoodie Big Yale",
+          "size": "M",
+          "qty": 8,
+          "location": "Aisle A",
+          "unit_cost": 22.0,
+          "list_price": 58.0
+        }
+      },
+      "result": "SUCCESS"
+    },
+    {
+      "test_id": 2,
+      "tool": "get_financial_info",
+      "serves_ticket": [
+        102,
+        103
+      ],
+      "input_used": {
+        "account": "checking",
+        "include_invoices": true
+      },
+      "input_rationale": "Ticket 102's cash question, and the business rule 3 check on open invoices.",
+      "output": {
+        "as_of": "2026-08-31",
+        "accounts": [
+          {
+            "name": "checking",
+            "balance": 3400,
+            "as_of_date": "2026-08-31"
+          }
+        ],
+        "total_cash": 3400,
+        "invoices": [
+          {
+            "id": 501,
+            "vendor_id": 1,
+            "vendor_name": "Bulldog Print Co",
+            "vendor_specialty": "apparel reprint",
+            "vendor_lead_days": 5,
+            "amount": 840,
+            "due_date": "2026-08-28",
+            "status": "open",
+            "description": "Rush reprint CC-TEE-WHITE S",
+            "days_until_due": -3,
+            "is_overdue": true,
+            "days_overdue": 3
+          }
+        ],
+        "open_invoice_total": 840,
+        "cash_after_open_invoices": 2560
+      },
+      "verification": [
+        {
+          "field": "balance",
+          "returned": 3400,
+          "database": 3400.0,
+          "match": true
+        },
+        {
+          "field": "invoice.id",
+          "returned": 501,
+          "database": 501,
+          "match": true
+        },
+        {
+          "field": "invoice.amount",
+          "returned": 840,
+          "database": 840.0,
+          "match": true
+        },
+        {
+          "field": "vendor_name",
+          "returned": "Bulldog Print Co",
+          "database": "Bulldog Print Co",
+          "match": true,
+          "derivation": "joined from vendors"
+        },
+        {
+          "field": "vendor_specialty",
+          "returned": "apparel reprint",
+          "database": "apparel reprint",
+          "match": true,
+          "derivation": "joined from vendors"
+        },
+        {
+          "field": "vendor_lead_days",
+          "returned": 5,
+          "database": 5,
+          "match": true,
+          "derivation": "joined from vendors"
+        },
+        {
+          "field": "due_date",
+          "returned": "2026-08-28",
+          "database": "2026-08-28",
+          "match": true
+        },
+        {
+          "field": "status",
+          "returned": "open",
+          "database": "open",
+          "match": true
+        },
+        {
+          "field": "days_until_due",
+          "returned": -3,
+          "database": -3,
+          "match": true,
+          "derivation": "due_date - desk.date_today"
+        },
+        {
+          "field": "days_overdue",
+          "returned": 3,
+          "database": 3,
+          "match": true,
+          "derivation": "negated days_until_due when open"
+        },
+        {
+          "field": "open_invoice_total",
+          "returned": 840,
+          "database": 840.0,
+          "match": true
+        },
+        {
+          "field": "cash_after_open_invoices",
+          "returned": 2560,
+          "database": 2560.0,
+          "match": true,
+          "derivation": "total_cash - open_invoice_total"
+        }
+      ],
+      "proof": {
+        "screenshot": "output/evidence/test2_get_financial_info.png",
+        "screenshot_sha256": "adfe22f8dc5978e3432f252aecb312ce5cf3eb60b8fa14ffb84a29a443502f15",
+        "db_query": "SELECT name,balance,date FROM cash_accounts WHERE name='checking'; SELECT i.*,v.name,v.specialty,v.lead_days FROM invoices i LEFT JOIN vendors v ON v.id=i.vendor_id WHERE i.id=501",
+        "db_result": {
+          "cash_account": {
+            "name": "checking",
+            "balance": 3400.0,
+            "date": "2026-08-31"
+          },
+          "invoice": {
+            "id": 501,
+            "vendor_id": 1,
+            "amount": 840.0,
+            "due_date": "2026-08-28",
+            "status": "open",
+            "description": "Rush reprint CC-TEE-WHITE S",
+            "vendor_name": "Bulldog Print Co",
+            "specialty": "apparel reprint",
+            "lead_days": 5
+          }
+        }
+      },
+      "business_rule_observed": "Rule 3 \u2014 invoice 501 is status 'open', so vendor 1 (Bulldog Print Co) is NOT clear to ship.",
+      "result": "SUCCESS",
+      "superseded_note": "Recorded 2026-10-06. The tool was later extended to read `leases`, so a call today also returns `leases`, `rent_due_total`, `total_obligations`, `cash_after_obligations` and `can_meet_all_obligations`. The `output` and screenshot above remain an accurate record of this test run; every field verified here is unchanged, and the additions are purely additive."
+    },
+    {
+      "test_id": 3,
+      "tool": "get_lease_info",
+      "serves_ticket": [
+        102
+      ],
+      "input_used": {
+        "lease_id": 1
+      },
+      "input_rationale": "Ticket 102 references lease 1.",
+      "output": {
+        "as_of": "2026-08-31",
+        "matched": 1,
+        "leases": [
+          {
+            "id": 1,
+            "space_name": "Chapel Street shop",
+            "landlord": "Elm City Properties",
+            "monthly_rent": 2400,
+            "next_due": "2026-09-02",
+            "notes": null,
+            "days_until_due": 2,
+            "is_overdue": false
+          }
+        ],
+        "total_monthly_rent": 2400
+      },
+      "verification": [
+        {
+          "field": "space_name",
+          "returned": "Chapel Street shop",
+          "database": "Chapel Street shop",
+          "match": true
+        },
+        {
+          "field": "landlord",
+          "returned": "Elm City Properties",
+          "database": "Elm City Properties",
+          "match": true
+        },
+        {
+          "field": "monthly_rent",
+          "returned": 2400,
+          "database": 2400.0,
+          "match": true
+        },
+        {
+          "field": "next_due",
+          "returned": "2026-09-02",
+          "database": "2026-09-02",
+          "match": true
+        },
+        {
+          "field": "notes",
+          "returned": null,
+          "database": null,
+          "match": true
+        },
+        {
+          "field": "days_until_due",
+          "returned": 2,
+          "database": 2,
+          "match": true,
+          "derivation": "next_due - desk.date_today"
+        },
+        {
+          "field": "is_overdue",
+          "returned": false,
+          "database": false,
+          "match": true,
+          "derivation": "days_until_due < 0"
+        }
+      ],
+      "proof": {
+        "screenshot": "output/evidence/test3_get_lease_info.png",
+        "screenshot_sha256": "e122139e462532ce503c759be83814455ccafdc4a9cec16152a07b992b20c2a4",
+        "db_query": "SELECT id,space_name,landlord,monthly_rent,next_due,notes FROM leases WHERE id=1",
+        "db_result": {
+          "id": 1,
+          "space_name": "Chapel Street shop",
+          "landlord": "Elm City Properties",
+          "monthly_rent": 2400.0,
+          "next_due": "2026-09-02",
+          "notes": null
+        }
+      },
+      "result": "SUCCESS"
+    }
+  ],
+  "summary": {
+    "tools_tested": 3,
+    "passed": 3,
+    "failed": 0,
+    "fields_verified": 28,
+    "mismatches": 0,
+    "overall_result": "SUCCESS",
+    "note": "All three tools returned values matching the database exactly, including NULL handling (leases.notes) and all derived fields. Every response carried as_of = desk.date_today, confirming business rule 1 holds through the MCP layer. Database unchanged by the tests \u2014 all three tools are read-only (SQLite mode=ro)."
+  }
+}
